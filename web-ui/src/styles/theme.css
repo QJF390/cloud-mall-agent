@@ -1,0 +1,51 @@
+/**
+ * 设计系统 · 巧见（Big Fish 春日感：天空蓝 × 花田黄）
+ * 核心原则：明亮通透的天空底色，阳光黄只做点缀与光感，
+ *          行动色交给天空蓝 —— 黄底白字对比度不足 2:1，不能当按钮色。
+ */
+:root {
+  /* ---------- 色彩 ---------- */
+  --c-bg: #f3f9fc;           /* 天空暖白（带一缕蓝，替代原米白） */
+  --c-bg-deep: #e9f4ee;      /* 淡青绿分区（花田的叶色） */
+  --c-surface: #ffffff;      /* 卡片面 */
+  --c-text: #2e3d45;         /* 深青灰正文（天空压暗后的颜色，不要纯黑） */
+  --c-text-sub: #5c7078;     /* 次级文字 */
+  --c-text-mute: #93a7b1;    /* 弱化文字 / 时间戳 */
+  --c-line: #dfeaf0;         /* 极淡分割线 */
+  --c-accent: #3e8fb0;       /* 天空蓝（按钮 / 链接 / hover 高亮） */
+  --c-accent-deep: #2f7391;  /* 蓝加深 */
+  --c-accent-soft: #e3f1f7;  /* 蓝浅底 */
+  --c-sun: #f6c445;          /* 阳光黄（下划线 / 光带 / 装饰点缀） */
+  --c-sun-deep: #b07d2b;     /* 深金（价格等需要对比度的暖色文字） */
+  --c-sun-soft: #fdf3d9;     /* 黄浅底 */
+  --c-success: #4f9d6f;
+  --c-danger: #d9736a;
+  --c-warn: #d9a441;
+
+  /* ---------- 圆角 ---------- */
+  --r-sm: 6px;
+  --r-md: 8px;
+  --r-lg: 16px;
+  --r-pill: 999px;
+
+  /* ---------- 阴影（带蓝调的空气感，不抢视线） ---------- */
+  --sh-card: 0 2px 12px rgba(46, 90, 110, 0.05);
+  --sh-hover: 0 14px 32px rgba(46, 90, 110, 0.12);
+  --sh-accent: 0 8px 26px rgba(62, 143, 176, 0.3);
+  --sh-nav: 0 1px 0 rgba(46, 61, 69, 0.05);
+
+  /* ---------- 字体 ---------- */
+  --font-sans: 'Inter', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  /* 标题用手写感楷体（系统自带，零加载成本），正文仍走无衬线保证小字可读 */
+  --font-serif: 'Kaiti SC', 'KaiTi', 'STKaiti', 'Songti SC', 'Noto Serif SC', Georgia,
+    'Times New Roman', serif;
+
+  /* ---------- 布局 ---------- */
+  --page-max: 1180px;
+  --nav-h: 68px;
+
+  /* ---------- 动效 ---------- */
+  --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --dur: 0.38s;
+}

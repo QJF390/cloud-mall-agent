@@ -1,0 +1,91 @@
+server:
+  port: 8085
+
+spring:
+  application:
+    name: admin-service
+  servlet:
+    multipart:
+      # Spring Boot 默认单文件上限只有 1MB —— 不显式放开，上传稍大的商品图会被直接截断报错
+      max-file-size: 5MB
+      # 请求总大小（多图上传时按所有文件之和算），必须 >= max-file-size
+      max-request-size: 20MB
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 127.0.0.1:8848
+        # 本地单机部署：显式注册 127.0.0.1，避免换 Wi-Fi/热点后残留过期地址
+        ip: 127.0.0.1
+        namespace: 4fbcf13a-853a-4f73-90d8-5569f59d827d
+        group: DEFAULT_GROUP
+    openfeign:
+      circuitbreaker:
+        enabled: true          # Feign 熔断开关
+      client:
+        config:
+          default:
+            connectTimeout: 3000
+            readTimeout: 5000
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      database: 0
+
+# ========== Resilience4j 熔断配置（聚合 user/product/order 三类下游） ==========
+resilience4j:
+  circuitbreaker:
+    configs:
+      default:
+        sliding-window-size: 10
+        minimum-number-of-calls: 5
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 10s
+        permitted-number-of-calls-in-half-open-state: 3
+    instances:
+      userFeignClient:
+        base-config: default
+      productFeignClient:
+        base-config: default
+      orderFeignClient:
+        base-config: default
+  timelimiter:
+    configs:
+      default:
+        timeout-duration: 5s
+
+# ========== 管理端安全策略 ==========
+admin:
+  # 管理员登录后拥有的兜底角色标识（未绑定角色时使用）
+  default-role: SUPER_ADMIN
+  # 免登录白名单（登录接口等）
+  exclude-paths:
+    - /admin/auth/login
+  # 首次启动且管理员表为空时，自动创建一个默认管理员（生产环境请改为 false 并手工建号）
+  init-default-account: true
+  default-username: admin
+  default-password: admin123
+
+  # ========== 商品图片上传 ==========
+  # 说明：当前实现是把文件写在本地磁盘并由本服务托管。
+  #       生产环境应替换为对象存储（OSS/COS），只需新增一个 FileStorageService 实现，上层无需改动。
+  upload:
+
+    dir: D:/demo/exdemo/uploads
+    # 对外访问前缀：必须与网关路由、前端代理三处保持一致
+    url-prefix: /uploads
+    # 单文件上限（MB），与 spring.servlet.multipart.max-file-size 保持一致
+    max-size-mb: 5
+    # 扩展名白名单（刻意不含 svg：SVG 可内嵌脚本，直出会变成存储型 XSS）
+    allowed-extensions:
+      - jpg
+      - jpeg
+      - png
+      - webp
+      - gif
+
+# ========== 日志 ==========
+logging:
+  level:
+    # Feign 接口日志（配合 FeignConfig 的 BASIC 级别）
+    com.exdemo.admin.feign: debug

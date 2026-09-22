@@ -1,0 +1,74 @@
+server:
+  port: 8087
+
+spring:
+  application:
+    name: chat-service
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 127.0.0.1:8848
+        # 本地单机部署：显式注册 127.0.0.1，避免换 Wi-Fi/热点后残留过期地址
+        ip: 127.0.0.1
+        namespace: 4fbcf13a-853a-4f73-90d8-5569f59d827d
+        group: DEFAULT_GROUP
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    # 与其它微服务一样「一服务一库」，聊天三张表建在 chat_db（脚本：sql/chat-schema.sql 会自动建库）
+    url: jdbc:mysql://127.0.0.1:3306/chat_db?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
+    username: root
+
+    password: 032513qjf
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      database: 0
+
+# ============ RocketMQ ============
+rocketmq:
+  name-server: 127.0.0.1:9876
+  producer:
+    group: chat-producer-group
+    # 发送超时：宁可快速失败让客户端重试，也不要把 WS 线程堵死
+    send-message-timeout: 3000
+    retry-times-when-send-failed: 2
+    # 单条消息上限：图片/商品卡片走 URL，正文不会大，4MB 足够
+    max-message-size: 4194304
+
+# ============ MyBatis-Plus ============
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+    db-config:
+      # 本项目实体统一用雪花 ID（IdType.ASSIGN_ID）
+      id-type: assign_id
+
+# ============ Sa-Token（与 user-service 共享同一份 Redis 会话） ============
+sa-token:
+  token-name: satoken
+  timeout: 2592000
+  is-concurrent: true
+  is-share: true
+  token-style: uuid
+  # 关闭自动读取 cookie，避免与浏览器默认行为耦合（前端统一走 header / query）
+  is-read-cookie: false
+
+# ============ 自定义业务配置 ============
+chat:
+  ws:
+    # WS 路径：网关不做 StripPrefix，/chat/** 原样转发过来，
+    # 所以这里必须注册完整路径 /chat/ws（与前端 ws URL 严格一致）
+    path: /chat/ws
+    # 心跳间隔（毫秒）：客户端心跳 + 服务端空闲踢出，双保险
+    heartbeat-interval: 30000
+  rate-limit:
+    # 令牌桶：每秒产生 20 个令牌，桶容量 40（允许 2 秒的突发）
+    permits-per-second: 20
+    capacity: 40
+  kefu:
+    # 平台官方客服账号（B2C 自营：商家=平台，用户咨询的对象就是它）
+    # 该 ID 必须是 t_user 中真实存在的一条记录，否则消息没人接
+    user-id: 10000
+    nickname: 官方客服

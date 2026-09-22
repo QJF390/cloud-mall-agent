@@ -1,0 +1,21 @@
+:root {
+  /* 主色（后台用稳重的蓝，区别于 C 端的文艺色） */
+  --c-primary: #3b6cf0;
+  --c-primary-deep: #2f56c4;
+
+  /* 中性色 */
+  --c-bg: #f5f7fb;
+  --c-side: #1f2533;
+  --c-card: #ffffff;
+  --c-border: #e5e9f2;
+  --c-text: #1f2533;
+  --c-text-sub: #6b7688;
+
+  /* 状态色 */
+  --c-success: #17a673;
+  --c-warning: #e8a33d;
+  --c-danger: #e5484d;
+
+  --radius: 8px;
+  --shadow-card: 0 1px 3px rgba(31, 37, 51, 0.06);
+}

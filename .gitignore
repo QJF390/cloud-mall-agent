@@ -1,0 +1,53 @@
+# ── Java / Maven ──
+target/
+*.class
+*.jar
+*.war
+*.lst
+
+# ── Logs ──
+*.log
+logs/
+
+# ── Node / Frontend ──
+node_modules/
+dist/
+dist-ssr/
+*.local
+
+# ── Python ──
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+env/
+.env
+*.env
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+htmlcov/
+
+# ── IDE ──
+.idea/
+.vscode/
+*.iml
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# ── OS ──
+.DS_Store
+Thumbs.db
+
+# ── Uploads / Runtime ──
+uploads/*
+!uploads/.gitkeep
+
+# ── Local temp / backup ──
+_backup_teach/
+_tmpjar/
+_tmp_strip_comments.py

@@ -1,0 +1,78 @@
+﻿# ========== MyBatis-Plus 公共配置 ==========
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+    db-config:
+      id-type: auto
+
+# ========== 数据库公共配置 ==========
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root
+
+# ========== 熔断默认参数（order-service + gateway 共用） ==========
+resilience4j:
+  circuitbreaker:
+    configs:
+      default:
+        sliding-window-size: 10
+        minimum-number-of-calls: 5
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 10s
+        permitted-number-of-calls-in-half-open-state: 3
+
+
+# =====================================================================
+# 支付宝沙箱配置（account-service 用）
+#
+# 在 Nacos 控制台：Data Id = account-service.yaml, Group = DEFAULT_GROUP
+# 追加下面这段（如果本地 application.yml 已配且 Nacos 里没有 account-service.yaml，
+# 则本地配置生效，可以不加）。
+#
+# 🔴 安全红线：merchantPrivateKey 是应用私钥，正式环境走 Nacos 配置或环境变量，
+#              绝不能提交到 git 仓库。下面这段仅用于本地沙箱联调。
+# =====================================================================
+alipay:
+  app-id: 9021000158636061
+  merchant-private-key: <你的应用私钥>
+  alipay-public-key: <支付宝公钥，注意不是应用公钥>
+  # notify_url：支付宝【服务器】来调你 → 必须公网可达 → 本地开发靠内网穿透，隧道换域名要同步改
+  notify-url: http://n4a93efc.natappfree.cc/alipay/notify
+  # return_url：支付宝把【用户浏览器】重定向过去 → 不需要公网可达 → 本地直连前端即可
+  return-url: http://localhost:5173/checkout
+  # 仅当 return_url 指回本服务的 /alipay/return 时才用得上（生产环境写法）
+  frontend-url: http://localhost:5173
+  sign-type: RSA2
+  charset: utf-8
+  gateway-url: https://openapi-sandbox.dl.alipaydev.com/gateway.do
+
+
+# =====================================================================
+# gateway 路由（Data Id = gateway.yaml, Group = DEFAULT_GROUP）
+#
+# 🔴🔴 必做：gateway 运行时真正生效的路由来自 Nacos，本地 application.yml 会被覆盖
+#            （本地改了不生效，实测 404）。接入支付宝回调必须同时在这里加一条：
+#
+#   - id: account-service-alipay
+#     uri: lb://account-service
+#     predicates:
+#       - Path=/alipay/**
+#
+# 加完后重启网关（当前版本不热刷新路由）。
+# =====================================================================
+
+
+# =====================================================================
+# admin-service 专属配置
+# 在 Nacos 控制台新建配置：Data Id = admin-service.yaml, Group = DEFAULT_GROUP
+# 说明：admin-service 只把「系统管理」数据落在自己的库 admin_db；
+#       用户/商品/订单均通过 Feign 聚合下游，不直连它们的库。
+#       建库脚本：sql/admin-schema.sql（务必先执行）
+# =====================================================================
+spring:
+  datasource:
+    url: jdbc:mysql://127.0.0.1:3306/admin_db?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
+  # 管理端登录失败计数等使用的 Redis（本地默认即可）
+

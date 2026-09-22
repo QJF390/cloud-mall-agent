@@ -1,0 +1,23 @@
+server:
+  port: 8082
+spring:
+  application:
+    name: product-service
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 127.0.0.1:8848
+        # 本地单机部署：显式注册 127.0.0.1，避免换 Wi-Fi/热点后残留过期地址
+        ip: 127.0.0.1
+        namespace: 4fbcf13a-853a-4f73-90d8-5569f59d827d
+        group: DEFAULT_GROUP
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      database: 0
+
+  elasticsearch:
+    uris: http://127.0.0.1:9200
+    connection-timeout: 3s
+    socket-timeout: 5s

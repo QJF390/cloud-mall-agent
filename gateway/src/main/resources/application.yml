@@ -1,0 +1,67 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: gateway
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 127.0.0.1:8848
+        # 本地单机部署：显式注册 127.0.0.1，避免换 Wi-Fi/热点后残留过期地址
+        ip: 127.0.0.1
+        namespace: 4fbcf13a-853a-4f73-90d8-5569f59d827d
+        group: DEFAULT_GROUP
+    gateway:
+      # 关闭自动路由：自动路由会把服务名当路径前缀（/user-service/user/login），
+      # 与 Sa-Token 白名单 / 前端约定的「干净路径」对不上，故统一改为下方显式路由。
+      discovery:
+        locator:
+          enabled: false
+
+      routes:
+        - id: user-service
+          uri: lb://user-service
+          predicates:
+            - Path=/user/**
+        - id: product-service
+          uri: lb://product-service
+          predicates:
+            - Path=/product/**
+        - id: order-service
+          uri: lb://order-service
+          predicates:
+            - Path=/cart/**,/order/**
+        - id: account-service
+          uri: lb://account-service
+          predicates:
+            - Path=/account/**
+        # 支付宝回调：/alipay/notify（异步通知）、/alipay/return（同步跳转）
+        # 都落在 account-service。前缀是 /alipay 而不是 /account，
+        # 是因为 notify_url / return_url 已按 /alipay/** 配置进了支付宝控制台，
+        # 改路径要同步改控制台，这里单独开一条路由代价最小。
+        - id: account-service-alipay
+          uri: lb://account-service
+          predicates:
+            - Path=/alipay/**
+        # 后台管理系统：统一入口 /admin/** 转发到 admin-service。
+        # 注意：admin-service 的 Controller 也要映射在 /admin 前缀下（与上面服务保持一致，网关不做 StripPrefix）。
+        - id: admin-service
+          uri: lb://admin-service
+          predicates:
+            - Path=/admin/**
+
+        - id: chat-service
+          uri: lb://chat-service
+          predicates:
+            - Path=/chat/**
+
+        - id: admin-uploads
+          uri: lb://admin-service
+          predicates:
+            - Path=/uploads/**
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      database: 0

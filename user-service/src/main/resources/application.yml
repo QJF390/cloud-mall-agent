@@ -1,0 +1,21 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: user-service
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      database: 0
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 127.0.0.1:8848
+        # 本地单机部署：显式注册 127.0.0.1，避免换 Wi-Fi/热点后
+        # 网卡 IP 变化导致注册中心残留过期地址，Feign/网关按旧 IP 调用必然失败
+        ip: 127.0.0.1
+        namespace: 4fbcf13a-853a-4f73-90d8-5569f59d827d
+        group: DEFAULT_GROUP
+

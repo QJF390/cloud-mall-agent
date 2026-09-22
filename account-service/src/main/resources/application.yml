@@ -1,0 +1,30 @@
+server:
+  port: 8083
+
+spring:
+  application:
+    name: account-service
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 127.0.0.1:8848
+        # 本地单机部署：显式注册 127.0.0.1，避免换 Wi-Fi/热点后残留过期地址
+        ip: 127.0.0.1
+        namespace: 4fbcf13a-853a-4f73-90d8-5569f59d827d
+        group: DEFAULT_GROUP
+
+alipay:
+  app-id: 9021000158636061
+  # 应用私钥：给请求签名，证明"请求确实是我发的"
+  merchant-private-key: MIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQDpjKzhsOEmWteEeTJFUe+dXIGGHJpvPg0WdpX5zbC61qrwTNSSemgzbUzXYLMOIO51MatYDVsqYaUCcImFPSZaBaGSr7fiMXn2aAfPvFXjlvWa0512A17OTyV8fpu99tXU6RIFMPvZAZM5lE/kuArKkJ8SSt66ehdrz0IGnhYGBNC4RuuxLR/Nh58u6os7djzqnjTFu0/s98Lf3NFc1Nv+T8skUuEfTQ83QF2Fw6DeAmkBm/Nd/Lvh3K4beXhFz0qRz4t2L17BRDK1H6wB2pdgZJLZJQ3oRJD5yko3bvGWjJYs/eFA8nOXUUx3e4Nvfj7KHGC5KLkUhKhN1Z/PI0jVAgMBAAECggEBALNZrInE46IosMiyqcBCI9icaXssDAzRggt2FcY4Bzf0EmFnHvc9uTeFADWFtPtsnrKw6fw8hX4ObkFpWrJPO1x2ZpXXC0dQ53Aqg5Ur9GlKTGIRkCJIhE26yfbI46EGJT/TnFsQOtdzNjRJiPEDxIW6ee36QQDDMalBCFs8m30STch64Utk5URs4JR3Ah+qIWGzypwdcVXR56SRRZQNi7eWimMoWZx3ahgvlI933SlAZhJLHzB/PqiDzIuFLMaRgbv/opsbJdEj08VmPqLNcHz2UEct3LDMpdspOK4gEFoLDIOcl21jm89wBbxCzhOjDXTSRuanxHXRrZGJ0Jfx/yECgYEA/a77o2Cl9UnMFAVuPIxkIlbxeknsgcRwswe7ubwRe7zIVGRrfpEhIiI6GIqD3/+HwKtFgPEjcdsb+UtAE0G8NvriyduM/kqZFdfM0OP95MiGRYrlDMdReQrtaQMesA7cgdTrzO0fRjazQHZ8t6rM5E8tNQc0WpXJ6jBEbLNnLOMCgYEA666gZ0AEDLh1usQfC8qOvcb2XGbZw8PWJDLUVZOQEC/Ghy5Us/UpFbyMnSCfmklPkStRrafnAcwka1M/QL1G/9NObTu/3+RzLO6boqEd/kUlPncn72SyW5Dd1jh13TX/4sllKL7KoCgygnCIPsZa/0moBTHcDzy8G+WJNoSBmOcCgYEAxFZDh4TrrNX6zpwNX2tArJshtYW1OBHzL3ySvANkfKH1Yet+jqyAOkzHLes2eYzpYiKsXklDJ4FvOxgUdVLw+pReJeB4VO8jYBZu/FUYUZMo6HXBJIy277mXWSkC/TvjSdCi1y3GgK8hOIj7qaLVhPYKhPoYeOtpJIlKy95lwgUCgYB5AtbVbOcnaOb6GI0gTsbv5mLEmwKhI8KmH3sq3XOQ/BbhfgZ7yBtqT7+bRg7s90tlbGqp0ZYpNBpXCQ1nPkhgPqz8JTulx/TjUziSTkvKLNKsuh3FK1zw6vcccS0DgiB635GTVDNR/JHCq+ko4kwC3FzrHeix4itr33WOiobIbQKBgQDCMFv0aejuM28JMWwUOwSczb5Wjp0hVUGdTRZ1X0hQBK9PeHrmWuoBEoPEDSQaNAug72arRTlf0H0KdmOj8XMkyglmNgPH6qDO5CWIuAsMorkPB1Ooef22ePCOT27dr/VR9wSIoXgOLYdXQnu8MTXVLOiGjHiM2Tj7YJrzTw0H6A==
+
+  alipay-public-key: MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAifUsHua8ZqGgOTOP20PL/gYhi0p9MLwWwH8avs4KHNzYco3xbI1gtfgatvHBgsOANfw+ydLfuTVVIMLnPYi1SilNgLCtB+0BY9dDhT6jYH55hBqIkdC92Ha48EoISXKfcPdsRb2Di31Owi7+KVDWLyg6+AXBmhXfwDshLxK3GJ7aSRtLTqb5srfsfxz1aGWbspwkfieYivIHW3t047SxSrIvHpgVV9GIENfg0mqowDfWG3BG8oHp5QwXFTSMC3kKJ3+Ll3eLryke8FEXYmOHyZSLxFl4KRkZYeMFHipc4bt8ZH2++e57OfAxzntzeOZAMhLEoQQJmSZDR0h+PkVMlQIDAQAB
+
+  notify-url: http://n4a93efc.natappfree.cc/alipay/notify
+
+  return-url: http://localhost:5173/checkout
+  # 支付完成后把浏览器跳回前端的地址（前端据此轮询充值状态）
+  frontend-url: http://localhost:5173
+  sign-type: RSA2
+  charset: utf-8
+  gateway-url: https://openapi-sandbox.dl.alipaydev.com/gateway.do

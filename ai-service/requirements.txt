@@ -1,0 +1,47 @@
+# AI Service (Python) dependencies
+# Python 3.10+ required
+
+# Web framework + SSE
+fastapi==0.115.0
+uvicorn[standard]==0.30.0
+sse-starlette==2.1.3
+
+# Config & validation
+pydantic-settings==2.5.0
+python-dotenv==1.0.1
+
+# HTTP client for LLM / internal tools
+httpx==0.27.2
+
+# Session storage (reuse project Redis)
+redis==5.0.8
+
+# --- LangChain / LangGraph stack ---
+# ⚠️ 锁版本！LangChain 生态迭代快、API 不稳定，别用 latest。
+#    精确到 patch（0.3.x 里的 x 也要写死），升级时单独一次提交 + 跑回归。
+#
+# 阶段二（chains/ 单轮 RAG）需要：
+langchain-core==0.3.49      # 已安装（2026-09 锁定）；升级时单独一次提交 + 跑回归
+# langchain-openai==0.2.x   # 暂不需要：core/llm_factory.py 走 httpx 直连 OpenAI 兼容接口
+
+# 阶段三（agents/ LangGraph 编排）需要：
+langgraph==0.2.60           # 已安装；0.2.x 与 0.3.x 的 API 有差异，别跨小版本升
+# langgraph-checkpoint-redis==2.x     # 🔴 复用你已有的 Redis，别引 Postgres
+#                                     #    （第 5 步接 checkpointer 时装，届时再锁版本）
+#
+# 阶段一/二（rag/ 检索）需要：
+# langchain-elasticsearch==0.3.x      # ES 的 BM25 + kNN
+# langchain-text-splitters==0.3.x     # 切分用
+# sentence-transformers==3.x          # 本地 embedding / reranker（bge 系列）
+# FlagEmbedding==1.3.x                # bge-m3 / bge-reranker（比上面更全，二选一）
+#
+# ⚠️ 注意 langchain-community 的体积很大（依赖一大堆），
+#    能不装就不装 —— 你要用的零件基本都在 langchain-core 里。
+#
+# 阶段五（图片生成）需要：
+pillow==10.4.0                       # 水印、元数据写入、占位图（2026-09 锁定）
+# boto3==1.x  or  minio==7.x          # 对象存储（当前落本地目录 + 静态路由，演进时再装）
+
+# --- Observability ---
+# Langfuse（推荐，开源自托管）或 LangSmith（LangChain官方，需联网）
+# langfuse==2.x

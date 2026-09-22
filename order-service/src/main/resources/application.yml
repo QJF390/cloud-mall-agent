@@ -1,0 +1,44 @@
+server:
+  port: 8084
+
+spring:
+  application:
+    name: order-service
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 127.0.0.1:8848
+        # 本地单机部署：显式注册 127.0.0.1，避免换 Wi-Fi/热点后残留过期地址
+        ip: 127.0.0.1
+        namespace: 4fbcf13a-853a-4f73-90d8-5569f59d827d
+        group: DEFAULT_GROUP
+    openfeign:
+      circuitbreaker:
+        enabled: true   # Feign 熔断开关
+      client:
+        config:
+          default:
+            connectTimeout: 3000   # 连接超时 3s
+            readTimeout: 5000      # 读取超时 5s
+
+# ========== Resilience4j 熔断配置 ==========
+resilience4j:
+  circuitbreaker:
+    configs:
+      default:
+        # 熔断器从 CLOSED → OPEN 的条件：最近 10 次调用中 ≥ 50% 失败
+        sliding-window-size: 10          # 滑动窗口大小
+        failure-rate-threshold: 50       # 失败率阈值（%）
+        wait-duration-in-open-state: 10s # OPEN 状态持续 10s 后进入 HALF_OPEN
+        permitted-number-of-calls-in-half-open-state: 3  # HALF_OPEN 时最多放行 3 次试探
+    instances:
+      productFeignClient:
+        base-config: default
+      userFeignClient:
+        base-config: default
+      accountFeignClient:
+        base-config: default
+  timelimiter:
+    configs:
+      default:
+        timeout-duration: 5s   # 调用超过 5s 直接超时降级
