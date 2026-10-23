@@ -25,7 +25,6 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * 商品业务实现
- * TODO: 补充业务逻辑
  * 查询时带上状态条件，普通用户看不到失效商品
  */
 
@@ -127,7 +126,7 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> impl
     @Override
     public List<Product> listProducts() {
         // C 端市集：只出 status=1，下架商品不出现在列表
-        // TODO[后续]：支持分页、category 筛选、关键词搜索、按 view_count/create_time 排序
+        // 分页/分类/关键词搜索走 /product/search（ES 读模型），此处只做兜底全量
         return productMapper.selectList(
                 Wrappers.<Product>lambdaQuery()
                         .eq(Product::getStatus, 1)
@@ -164,7 +163,7 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> impl
 
     @Override
     public R<Boolean> deductStock(Long productId, Integer quantity) {
-    //TODO解决库存超卖问题
+        // 防超卖 = Redis 分布式锁（串行化）+ SQL 层 stock >= quantity 条件更新（原子扣减）
         if (quantity==null||quantity<=0){
             return R.fail("数量不能为空");
         }
@@ -192,7 +191,6 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> impl
 
     @Override
     public R<Boolean> revertStock(Long productId, Integer quantity) {
-        // TODO[实现]：回补库存
         // 1. 参数校验（productId / quantity 非空且 > 0）
         if (productId==null||productId<=0||quantity==null||quantity<=0){
             return R.fail("传入参数错误");

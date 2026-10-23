@@ -6,7 +6,7 @@ import org.apache.ibatis.annotations.Mapper;
 
 /**
  * 管理员账号 Mapper。
- * TODO: 复杂查询写 @Select 或 XML。
+ * <p>当前查询均可由 BaseMapper + LambdaWrapper 覆盖；后续出现复杂统计再补 @Select 或 XML。</p>
  */
 @Mapper
 public interface AdminUserMapper extends BaseMapper<AdminUser> {

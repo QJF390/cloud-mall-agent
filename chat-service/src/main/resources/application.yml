@@ -15,10 +15,10 @@ spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     # 与其它微服务一样「一服务一库」，聊天三张表建在 chat_db（脚本：sql/chat-schema.sql 会自动建库）
-    url: jdbc:mysql://127.0.0.1:3306/chat_db?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
-    username: root
-
-    password: 032513qjf
+    url: ${DB_URL:jdbc:mysql://127.0.0.1:3306/chat_db?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true}
+    username: ${DB_USERNAME:root}
+    # 🔴 不入库：本地用环境变量或 application-local.yml（已被 .gitignore 忽略）注入
+    password: ${DB_PASSWORD:}
   data:
     redis:
       host: localhost

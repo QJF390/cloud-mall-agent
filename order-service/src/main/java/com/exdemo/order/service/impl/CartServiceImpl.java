@@ -73,7 +73,6 @@ public class CartServiceImpl extends ServiceImpl<CartMapper, Cart> implements Ca
 
     @Override
     public R<Boolean> updateQuantity(Long userId, Long productId, Integer quantity) {
-        // TODO[实现]：校验 quantity > 0 后 updateById / 或数量改为 0 时直接删除
         if (userId == null || productId == null || quantity == null || quantity < 0) {
             return R.badRequest("参数错误");
         }
@@ -103,8 +102,7 @@ public class CartServiceImpl extends ServiceImpl<CartMapper, Cart> implements Ca
 
     @Override
     public R<Boolean> removeFromCart(Long userId, Long productId) {
-        // TODO[实现]：DELETE FROM t_cart WHERE user_id=? AND product_id=?
-        //            注意删除条件要带 userId，防止越权删别人的购物车
+        // 删除条件必须带 userId，否则可越权删别人的购物车
         boolean success = remove(
                 Wrappers.<Cart>lambdaQuery()
                         .eq(Cart::getUserId, userId)
@@ -168,7 +166,7 @@ public class CartServiceImpl extends ServiceImpl<CartMapper, Cart> implements Ca
 
     @Override
     public R<Boolean> clearCart(Long userId) {
-        // TODO[实现]：DELETE FROM t_cart WHERE user_id=?
+        // 清空同样必须带 userId，范围限定在本人购物车
         Wrapper<Cart> wrapper = Wrappers.<Cart>lambdaQuery()
                 .eq(Cart::getUserId, userId);
         boolean success = remove(wrapper);

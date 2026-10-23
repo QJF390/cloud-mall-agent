@@ -24,7 +24,8 @@ import com.exdemo.common.util.ValidationUtil;
 
 /**
  * 用户业务实现
- * TODO: 补充业务逻辑
+ * <p>缓存采用「用户名 + 手机号」双索引：两种登录方式都要能命中缓存，
+ * 变更用户状态时两个 key 必须一起清理（见 evictUserCache）。</p>
  */
 @Service
 public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements UserService {

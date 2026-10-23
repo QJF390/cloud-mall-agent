@@ -6,7 +6,8 @@ import org.apache.ibatis.annotations.Mapper;
 
 /**
  * 用户数据访问层
- * TODO: 补充自定义 SQL 方法
+ * <p>CRUD 全部由 BaseMapper 提供；条件查询在 Service 侧用 lambdaQuery() 表达，
+ * 编译期可校验字段名，比手写 SQL 更抗重构。</p>
  */
 @Mapper
 public interface UserMapper extends BaseMapper<User> {

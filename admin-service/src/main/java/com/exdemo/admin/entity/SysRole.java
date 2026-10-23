@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 
 /**
  * 系统角色（系统管理 / RBAC）。
- * TODO: 补充权限点集合（可用 JSON 存菜单/按钮权限）。
+ * <p>permissions 以 JSON 数组存储菜单/按钮权限点，如 ["admin:user:list"]。</p>
  */
 @Data
 @TableName("t_sys_role")

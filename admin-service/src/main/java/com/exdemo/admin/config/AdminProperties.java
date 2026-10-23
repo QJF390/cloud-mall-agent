@@ -24,6 +24,9 @@ public class AdminProperties {
     /** 默认管理员登录名 */
     private String defaultUsername = "admin";
 
-    /** 默认管理员初始密码（首次登录后请立即修改） */
-    private String defaultPassword = "admin123";
+    /**
+     * 默认管理员初始密码（首次登录后请立即修改）。
+     * 🔴 不由代码兜底：必须显式通过环境变量 ADMIN_INIT_PASSWORD 注入，避免弱口令进生产。
+     */
+    private String defaultPassword = "";
 }

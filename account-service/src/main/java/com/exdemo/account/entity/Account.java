@@ -10,7 +10,8 @@ import java.time.LocalDateTime;
 
 /**
  * 账户实体
- * TODO: 补充字段、业务逻辑
+ * <p>balance 与 frozenAmount 分离是担保交易的基础：
+ * 买家付款只是把钱从 balance 挪到 frozenAmount，确认收货才真正打款给卖家。</p>
  */
 @Data
 @TableName("t_account")

@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 
 /**
  * 用户实体
- * TODO: 补充字段、业务逻辑
+ * <p>密码字段不参与序列化下发，对外只暴露 UserDto 脱敏结构。</p>
  */
 @Data
 @TableName("t_user")

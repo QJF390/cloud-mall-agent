@@ -1,256 +1,148 @@
-# 微服务实战框架 —— Nacos 版
+# 巧见 · 手作市集（Cloud Mall）
 
-## 项目概述
+一个 **手作 / 生鲜电商全栈微服务实战项目**：Spring Boot 3 + Spring Cloud 后端、Vue 3 双前端（C 端商城 + B 端后台），外加一个 Python **AI 导购助手**（LangGraph Agent + RAG + 文生图）。
 
-这是一个**微服务骨架项目**，包含基础框架和配置，以及**空的业务骨架文件**（entity / mapper / service / controller / feign / dto）。
-
-所有骨架文件已创建好，你只需在 `TODO` 注释处填充业务逻辑，通过动手实战来熟练微服务核心技术。
-
----
-
-## 架构图
-
-```
-                         ┌─────────────┐
-                         │   Nacos      │
-                         │ :8848        │
-                         │ 注册+配置中心 │
-                         └──────┬───────┘
-                                │ 服务注册/发现
-        ┌───────────────────────┼───────────────────────┐
-        ▼                       ▼                       ▼
-┌──────────────┐        ┌──────────────┐        ┌──────────────┐
-│ user-service │        │product-service│        │account-service│
-│    :8081     │        │    :8082     │         │    :8083     │
-└──────────────┘        └──────────────┘        └──────────────┘
-        │                       │                       │
-        └───────────────────────┼───────────────────────┘
-                                │ Feign 远程调用
-                                ▼
-                       ┌────────────────┐
-                       │  order-service │
-                       │     :8084      │
-                       │ Feign + 熔断   │
-                       └────────────────┘
-                                ▲
-                                │
-                       ┌────────────────┐
-                       │  API 网关       │
-                       │  Gateway:8080  │
-                       │ 路由/负载/熔断   │
-                       └────────────────┘
-```
+> 面向微服务学习者：项目把「注册中心 → 网关 → 服务调用 → 熔断降级 → 担保交易 → 支付回调 → 实时 IM → LLM Agent」这条链路全部跑通，每个知识点都能在代码里找到落点。
+>
+> 完整文档（启动步骤、Nacos 配置、验证清单）见 **[docs/微服务实战指南.md](docs/微服务实战指南.md)**。
 
 ---
 
-## 涉及的核心微服务知识点
+## 功能总览
 
-| 知识点 | 你的学习目标 |
+| 端 | 能力 |
 |---|---|
-| **Nacos 服务注册与发现** | 服务启动自动注册到 Nacos，通过服务名互相发现 |
-| **Nacos 配置中心** | 配置统一管理、动态刷新（bootstrap.yml） |
-| **API 网关 Gateway** | 统一入口路由，`lb://service-name` 负载均衡 |
-| **OpenFeign 远程调用** | 像调用本地方法一样调用远程服务 |
-| **LoadBalancer 负载均衡** | 请求自动分发到多个实例 |
-| **Resilience4j 熔断降级** | 下游服务挂了你也不崩 |
-| **统一响应 & 全局异常** | `R<T>` 封装 + `@RestControllerAdvice` |
-| **独立数据库** | 每个微服务自己的 H2 数据库 |
+| **C 端商城** `web-ui:5173` | 注册登录（密码 / 手机验证码）、商品搜索、购物车、下单结算、**支付宝沙箱支付 + 余额充值**、在线客服、**AI 导购助手**（SSE 流式 / 文生图） |
+| **B 端后台** `admin-ui:5174` | 仪表盘、商品管理（含图片上传）、订单管理、用户管理、RBAC 角色权限、操作日志 |
+| **AI 助手** `ai-service:8000` | 意图路由 + 工具调用多轮 Agent、RAG 检索增强、模型分级与护栏；**无 Key 自动降级 mock，项目仍可跑通** |
 
 ---
 
-## 项目结构（骨架文件已创建，TODO 等你填）
+## 架构
 
 ```
-exdemo/
-├── pom.xml                            # 父工程（版本管理）
-├── common/                            # 公共模块（你一般不用改）
-│   └── src/main/java/.../common/
-│       ├── result/R.java              #   统一响应 {code, message, data}
-│       └── exception/
-│           ├── BizException.java      #   业务异常类
-│           └── GlobalExceptionHandler.java
-├── gateway/                           # API 网关
-│   └── src/main/java/.../gateway/
-│       ├── GatewayApplication.java    #   @EnableDiscoveryClient
-│       ├── config/CorsConfig.java     #   跨域配置
-│       └── controller/FallbackController.java
-├── user-service/                      # 用户服务（骨架已创建，填 TODO）
-│   └── src/main/java/.../user/
-│       ├── entity/User.java           #   MyBatis-Plus 实体
-│       ├── mapper/UserMapper.java     #   继承 BaseMapper
-│       ├── service/UserService.java   #   继承 IService
-│       ├── service/impl/UserServiceImpl.java
-│       └── controller/UserController.java
-├── product-service/                   # 商品服务（同上）
-│   ├── entity/Product.java
-│   ├── mapper/ProductMapper.java
-│   ├── service/ProductService.java
-│   ├── service/impl/ProductServiceImpl.java
-│   └── controller/ProductController.java
-├── order-service/                     # 订单服务（重点：Feign）
-│   ├── entity/Order.java
-│   ├── mapper/OrderMapper.java
-│   ├── service/OrderService.java
-│   ├── service/impl/OrderServiceImpl.java
-│   ├── controller/OrderController.java
-│   ├── dto/UserDTO.java               #   Feign 跨服务 DTO
-│   ├── dto/ProductDTO.java
-│   ├── dto/AccountDTO.java
-│   ├── feign/UserFeignClient.java     #   @FeignClient(name="user-service")
-│   ├── feign/ProductFeignClient.java
-│   ├── feign/AccountFeignClient.java
-│   └── feign/fallback/                #   熔断降级类
-│       ├── UserFeignFallback.java
-│       ├── ProductFeignFallback.java
-│       └── AccountFeignFallback.java
-└── account-service/                   # 账户服务（同上）
-    ├── entity/Account.java
-    ├── mapper/AccountMapper.java
-    ├── service/AccountService.java
-    ├── service/impl/AccountServiceImpl.java
-    └── controller/AccountController.java
+        web-ui:5173              admin-ui:5174
+                 └──────────┬──────────┘
+                            ▼
+                  ┌────────────────────┐
+                  │  Gateway :8080     │  Sa-Token 鉴权 / 路由 / 负载均衡
+                  └─────┬──────────────┘
+        ┌───────────┬───┴────┬─────────┬──────────┬──────────┐
+        ▼           ▼        ▼         ▼          ▼          ▼
+   user-service product-  order-   account-   admin-     chat-service
+      :8081     service   service  service    service       :8087
+                :8082     :8084     :8083      :8085
+        │                    │         │          │            │
+        │   OpenFeign + Resilience4j  │          │        WebSocket
+        └──────── 跨服务调用 ──────────┘          │       + RocketMQ
+                                                 │
+    Python ai-service :8000 ──HTTP──► Gateway ────┘（工具回调走网关，不绕过鉴权）
+
+依赖中间件：Nacos :8848 · MySQL :3306 · Redis :6379 · RocketMQ :9876（可选）· Elasticsearch :9200（可选）
 ```
 
+| 服务 | 端口 | 库 | 说明 |
+|---|---|---|---|
+| gateway | 8080 | — | 统一入口，路由前缀 `/user` `/product` `/order` `/cart` `/account` `/admin` `/chat` `/uploads` `/alipay` |
+| user-service | 8081 | `user_db` | 用户、登录注册 |
+| product-service | 8082 | `product_db` | 商品、库存、ES 检索 |
+| account-service | 8083 | `account_db` | 余额、充值、支付宝支付与回调验签 |
+| order-service | 8084 | `order_db` | 购物车、订单编排（Feign 聚合下游） |
+| admin-service | 8085 | `admin_db` | 后台系统管理，聚合下游数据 |
+| chat-service | 8087 | `chat_db` | 客服 WebSocket 会话、消息持久化 |
+| ai-service | 8000 | — | AI 导购 Agent，SSE 流式输出 |
+
 ---
 
-## 环境准备
+## 技术栈
 
-| 组件 | 说明 |
-|---|---|
-| JDK 17+ | 必须 |
-| Maven 3.8+ | 必须 |
-| Nacos 2.x | [下载 Nacos](https://github.com/alibaba/nacos/releases)，解压后 `bin/startup.cmd -m standalone` |
+Spring Boot 3.2 · Spring Cloud 2023 · Spring Cloud Alibaba 2023 · Nacos 2.x · Spring Cloud Gateway · OpenFeign + LoadBalancer · Resilience4j · Sa-Token · MyBatis-Plus + MySQL 8 · Redis · RocketMQ · Elasticsearch · 支付宝沙箱 SDK · WebSocket + SSE · Vue 3 + Vite + Pinia · LangGraph + FastAPI
 
 ---
 
-## 启动顺序
+## 微服务知识点索引
+
+每个知识点解决什么问题、在本项目哪段代码里体现：
+
+| 知识点 | 解决什么问题 | 代码落点 |
+|---|---|---|
+| Nacos 注册与发现 | 服务 IP 漂移后不用改配置，按服务名寻址 | 各服务 `application.yml` 的 `spring.cloud.nacos.discovery` |
+| Nacos 配置中心 | 配置集中管理 + 动态刷新 | 各服务 `bootstrap.yml`，共享配置 `common-config.yaml` |
+| Gateway 统一入口 | 前端只认一个域名，鉴权收口 | `gateway/application.yml` 的 `routes`；**运行时以 Nacos `gateway.yaml` 为准** |
+| OpenFeign | 跨服务调用像调本地方法 | `order/feign/UserFeignClient.java` 等 |
+| Resilience4j 熔断 | 下游挂了不拖垮上游 | `order-service/application.yml` + `order/feign/fallback/` |
+| 统一响应 & 全局异常 | 前后端契约一致 | `common/result/R.java`、`GlobalExceptionHandler.java` |
+| 防超卖 | 高并发下库存不为负 | `ProductServiceImpl#deductStock`：Redis 锁 + SQL `stock >= quantity` 原子更新 |
+| 担保交易状态机 | 钱先冻在平台，确认收货才打款 | `order/constant/OrderStatus.java`；`balance` / `frozenAmount` 分离 |
+| 超时关单 | 未支付订单不长期占库存 | `order/task/OrderTimeoutCancelTask` |
+| 幂等 | 支付回调重复到达不重复入账 | `account/controller/AlipayCallbackController` |
+| AOP 审计日志 | 后台操作可追溯 | `admin/aspect/AdminOperationAspect` |
+
+---
+
+## 快速开始
+
+### 1. 环境
+
+JDK 17+ · Maven 3.8+ · MySQL 8+ · Redis 6+ · Nacos 2.x（standalone）· Node 18+（前端）· Python 3.10+（AI）
+> RocketMQ / Elasticsearch 可选，不启动则相关链路走降级逻辑。
+
+### 2. 建库
 
 ```bash
-# 0. 启动 Nacos（单机模式）
-cd nacos/bin
-startup.cmd -m standalone
-# 访问 http://127.0.0.1:8848/nacos 确认启动成功
-
-# 1. 编译项目
-cd d:/demo/exdemo
-mvn clean install -DskipTests
-
-# 2. 启动网关（必须先启动，否则路由不通）
-cd gateway
-mvn spring-boot:run
-
-# 3. 启动业务服务（可以并行启动，任意顺序）
-cd ../user-service     && mvn spring-boot:run
-cd ../product-service  && mvn spring-boot:run
-cd ../account-service  && mvn spring-boot:run
-cd ../order-service    && mvn spring-boot:run
+mysql -u root -p < sql/schema.sql                  # 用户/商品/订单/账户库
+mysql -u root -p < sql/admin-schema.sql            # 后台管理库
+mysql -u root -p < sql/chat-schema.sql             # 聊天会话库
+mysql -u root -p < sql/alipay_recharge.sql         # 充值流水
+mysql -u root -p < sql/insert-sample-products.sql  # 示例商品
+mysql -u root -p < sql/kefu-account.sql            # 平台客服账号
 ```
 
-启动后访问 Nacos 控制台 `http://127.0.0.1:8848/nacos` → 服务管理 → 服务列表，应该看到 5 个服务都在线。
+### 3. Nacos（**必做，否则服务互相找不到**）
 
----
+1. 新建命名空间，ID 填 `4fbcf13a-853a-4f73-90d8-5569f59d827d`（项目未使用默认 `public`）。
+2. 在该命名空间下建配置：`common-config.yaml`（**必建**，公共数据源/MyBatis-Plus/Resilience4j）、`gateway.yaml`（**必建**，网关路由以它为准）。
 
-## 你现在需要做的事情
+> 配置模板见根目录 `nacos-config.txt`，按注释拆分粘贴。
 
-按照微服务开发流程，逐一手写各模块的业务逻辑（骨架文件已创建，只需填 TODO）：
+### 4. 启动
 
-### 第 1 步：从 user-service 开始（最简单）
-
-在 `user-service` 的骨架文件里填充业务逻辑：
-
-```
-user/
-├── entity/User.java          # MyBatis-Plus 实体（@TableName + @TableId）
-├── mapper/UserMapper.java    # 继承 BaseMapper<T>，复杂 SQL 写 @Select
-├── service/UserService.java  # 继承 IService<T>
-├── service/impl/UserServiceImpl.java  # 继承 ServiceImpl<Mapper, T>
-└── controller/UserController.java     # REST API
+```bash
+nacos/bin/startup.cmd -m standalone     # 0) 注册中心
+mvn clean install -DskipTests           # 1) common 模块必须先装
+cd gateway && mvn spring-boot:run       # 2) 先启网关
+mvn -pl user-service,product-service,order-service,account-service,admin-service,chat-service spring-boot:run
+cd web-ui   && npm install && npm run dev     # :5173
+cd admin-ui && npm install && npm run dev     # :5174
+cd ai-service && python main.py               # :8000
 ```
 
-### 第 2 步：写 product-service
+### 5. 验证知识点
 
-同样建 entity → **mapper** → service → controller，在骨架上填充逻辑
-
-> MyBatis-Plus 比 JPA 更简洁：Mapper 继承 `BaseMapper<T>` 即可拥有全套 CRUD，无需手写 SQL。
-
-### 第 3 步：写 account-service
-
-同上
-
-### 第 4 步：写 order-service（重点：Feign 远程调用）
-
-```
-order/
-├── entity/Order.java
-├── mapper/OrderMapper.java        # MyBatis-Plus BaseMapper
-├── dto/                           # 跨服务 DTO
-│   ├── UserDTO.java
-│   ├── ProductDTO.java
-│   └── AccountDTO.java
-├── feign/                         # Feign 客户端
-│   ├── UserFeignClient.java       # @FeignClient(name="user-service")
-│   ├── ProductFeignClient.java
-│   ├── AccountFeignClient.java
-│   └── fallback/                  # 熔断降级
-│       ├── UserFeignFallback.java
-│       ├── ProductFeignFallback.java
-│       └── AccountFeignFallback.java
-├── service/OrderService.java      # 编排逻辑（Feign 调用 + 事务）
-└── controller/OrderController.java
-```
-
-### 第 5 步：在 Nacos 配置中心添加配置（进阶）
-
-在 Nacos 控制台创建配置：
-- Data ID: `user-service.yaml`
-- Group: `DEFAULT_GROUP`
-- 内容：数据库连接、自定义业务参数等
-
----
-
-## Feign 远程调用示例（骨架）
-
-```java
-// 在 order-service 中调用 user-service
-@FeignClient(name = "user-service", fallback = UserFeignFallback.class)
-public interface UserFeignClient {
-
-    @GetMapping("/user/{id}")
-    R<UserDTO> getUserById(@PathVariable("id") Long id);
-}
-```
-
-关键点：
-- `name = "user-service"` → 与 Nacos 中注册的服务名一致
-- `fallback` → 熔断降级类
-- 方法签名对应被调用服务的 Controller 接口
-
----
-
-## Nacos 配置中心使用（可选）
-
-你的 `bootstrap.yml` 已经配好了，在 Nacos 控制台创建配置后可以：
-- 动态修改配置无需重启
-- 用 `@RefreshScope` + `@Value` 实现热更新
-- 不同环境（dev/test/prod）用不同 namespace 隔离
-
----
-
-## 核心文件速查
-
-| 要看的文件 | 重点 |
+| 想验证 | 怎么验 |
 |---|---|
-| `gateway/application.yml` | 路由规则 `lb://` + CircuitBreaker 熔断 |
-| `order-service/application.yml` | Feign 超时 + Resilience4j 配置 |
-| `common/R.java` | 统一响应格式，所有接口都用它 |
-| `common/GlobalExceptionHandler.java` | 全局异常拦截 |
+| 服务注册 | Nacos 控制台看 6 个业务服务是否在线 |
+| 网关路由 | `localhost:8081/user/get/1` 与 `localhost:8080/user/get/1` 结果一致 |
+| **熔断降级** | 停掉 `product-service` 再下单，应快速返回降级结果而非 500 |
+| 防超卖 | `jmeter/stock_deduct_test.jmx` 并发压测，库存不为负 |
 
 ---
 
-## 学习建议
+## 安全说明
 
-1. **先不要写 Feign**，把 user-service 写完，用 Postman 通过网关 `http://localhost:8080/api/user/xxx` 调通
-2. 再写 product-service、account-service，同样各自治通
-3. 最后写 order-service，练习 Feign 跨服务调用
-4. 尝试停掉 product-service 再调 order 接口，观察熔断降级效果
-5. 尝试在 Nacos 配置中心加配置，看 `@RefreshScope` 是否生效
+- 代码中**不含任何真实凭据**：数据库密码、管理员密码、支付宝密钥全部通过环境变量注入。
+- 本地覆盖配置请用 `application-local.yml` / `.env`（已被 `.gitignore` 忽略）。
+- 密钥一旦误提交，正确做法是到平台**轮换/作废**，而非仅删除提交——Git 历史仍会保留。
+- 支付回调必须**验签 + 幂等**；演示使用支付宝沙箱，不产生真实资金流。
+
+---
+
+## 已知边界
+
+- 图片上传落本地磁盘，生产应换对象存储（`FileStorageService` 已留扩展点）。
+- 未引入 Seata，跨服务一致性靠本地事务 + 可靠消息 + 幂等兜底。
+- 购物车结算按 B2C 自营处理（一次结算一张订单）；改 C2C 多卖家需在 `CartService#checkout` 拆单。
+
+---
+
+完整实战文档见 **[docs/微服务实战指南.md](docs/微服务实战指南.md)**。本项目仅用于学习交流，二次分发请替换示例数据与密钥。

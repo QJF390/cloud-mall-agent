@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 
 /**
  * 系统配置（系统管理 / 参数配置）。
- * TODO: 补充配置分组、是否可热更新（配合 @RefreshScope）等。
+ * <p>按 configGroup 分组管理；需要热更新的参数配合 Nacos 配置的 @RefreshScope 使用。</p>
  */
 @Data
 @TableName("t_sys_config")

@@ -12,7 +12,7 @@ import java.util.List;
 
 /**
  * 商品控制器
- * TODO: 补充 REST API 接口
+ * <p>/admin/** 前缀接口只允许 admin-service 经 Feign 调用，网关侧不对公网暴露。</p>
  */
 @RestController
 @RequestMapping("/product")

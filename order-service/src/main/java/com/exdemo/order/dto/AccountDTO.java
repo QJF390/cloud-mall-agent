@@ -6,7 +6,7 @@ import java.math.BigDecimal;
 
 /**
  * 账户 DTO（Feign 远程调用返回）
- * TODO: 补充字段，与 account-service 返回结构一致
+ * <p>只透出余额，不下发任何可推导用户资产的敏感字段。</p>
  */
 @Data
 public class AccountDTO {

@@ -9,7 +9,8 @@ import java.time.LocalDateTime;
 
 /**
  * 操作日志（系统管理 / 审计）。
- * TODO: 结合 AOP 切面自动落库（记录操作人、接口、耗时、结果）。
+ * <p>由 AdminOperationAspect 切面在 @AdminOperation 标注的方法上自动落库，
+ * 记录操作人、接口、耗时与结果；落库失败只告警，不反噬业务。</p>
  */
 @Data
 @TableName("t_sys_log")

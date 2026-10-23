@@ -13,7 +13,7 @@ import java.math.BigDecimal;
 
 /**
  * 账户控制器
- * TODO: 补充 REST API 接口
+ * <p>/recharge 已废弃：不经过支付直接加钱属于资损漏洞，充值统一走 /account/recharge/create。</p>
  */
 @RestController
 @RequestMapping("/account")

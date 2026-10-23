@@ -6,7 +6,7 @@ import java.math.BigDecimal;
 
 /**
  * 商品 DTO（Feign 远程调用返回）
- * TODO: 补充字段，与 product-service 返回结构一致
+ * <p>status 必须带上：购物车要据此把已下架商品标记为失效，而不是静默丢弃。</p>
  */
 @Data
 public class ProductDTO {

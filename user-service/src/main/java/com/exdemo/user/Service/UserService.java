@@ -10,7 +10,8 @@ import java.util.List;
 
 /**
  * 用户业务接口
- * TODO: 补充业务方法
+ * <p>基础 CRUD 继承自 IService，这里只声明带业务语义的方法
+ * （注册/登录/验证码登录/状态变更）。</p>
  */
 @Service
 public interface UserService extends IService<User> {

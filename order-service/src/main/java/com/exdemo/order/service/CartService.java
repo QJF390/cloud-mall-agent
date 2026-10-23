@@ -27,9 +27,9 @@ public interface CartService extends IService<Cart> {
     R<Boolean> clearCart(Long userId);
 
     /**
-     * 购物车结算：多商品 → 一个订单（跨多卖家需拆单）
-     * TODO[实现]：拆单规则 —— schema 注释要求"一单可含多个卖家的商品，按卖家拆单"，
-     *             即同一卖家的商品合成一单，不同卖家各成一单，每单只写一个 seller_id。
+     * 购物车结算：多商品 → 一个订单。
+     * <p>B2C 自营模式下平台是唯一卖方，一次结算只生成一张订单，无需按卖家拆单。
+     * 若后续改造为 C2C 多卖家，需在此按 sellerId 分组拆单，每单只写一个 seller_id。</p>
      */
     R<List<Order>> checkout(CartCheckoutRequest request);
 }

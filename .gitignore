@@ -44,10 +44,30 @@ htmlcov/
 Thumbs.db
 
 # ── Uploads / Runtime ──
-uploads/*
-!uploads/.gitkeep
+# 目录级忽略：上传产物属于运行时数据，任何深度的 uploads 目录都不入库
+uploads/
+**/uploads/
 
 # ── Local temp / backup ──
 _backup_teach/
 _tmpjar/
 _tmp_strip_comments.py
+# 根目录一次性调试脚本 / 输出文本（不属于项目源码）
+/*.py
+/*.txt
+!/.gitignore
+u5/
+/*.docx
+/*.pdf
+
+# ── 本地配置覆盖层 ──
+# 约定：application-local.yml / application-secret.yml 放真实连接串与密钥，
+# 只允许存在于本机，一旦提交 CI 应当失败。
+application-local.yml
+application-local.yaml
+application-secret.yml
+application-secret.yaml
+*-local.yml
+!**/.env.example
+.env.local
+.env.*.local

@@ -35,11 +35,11 @@ resilience4j:
 #              绝不能提交到 git 仓库。下面这段仅用于本地沙箱联调。
 # =====================================================================
 alipay:
-  app-id: 9021000158636061
-  merchant-private-key: <你的应用私钥>
-  alipay-public-key: <支付宝公钥，注意不是应用公钥>
+  app-id: ${ALIPAY_APP_ID}          # 沙箱应用 APPID，开放平台沙箱页可查
+  merchant-private-key: ${ALIPAY_MERCHANT_PRIVATE_KEY}
+  alipay-public-key: ${ALIPAY_PUBLIC_KEY}
   # notify_url：支付宝【服务器】来调你 → 必须公网可达 → 本地开发靠内网穿透，隧道换域名要同步改
-  notify-url: http://n4a93efc.natappfree.cc/alipay/notify
+  notify-url: https://<your-tunnel-domain>/alipay/notify
   # return_url：支付宝把【用户浏览器】重定向过去 → 不需要公网可达 → 本地直连前端即可
   return-url: http://localhost:5173/checkout
   # 仅当 return_url 指回本服务的 /alipay/return 时才用得上（生产环境写法）
