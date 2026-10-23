@@ -133,7 +133,7 @@ class HybridRetriever:
         history_filters = self._collect_history_filters(history)
 
         system_prompt = (
-            "你是电商平台的查询改写器。把用户的口语问题改写成检索友好的表达，"
+            "你是手作平台的查询改写器。把用户的口语问题改写成检索友好的表达，"
             "并抽取其中的结构化过滤条件。只输出 JSON，格式：\n"
             '{"semantic_query": "检索用表达", "filters": {}, "need_clarify": false}\n'
             "filters 只允许这些 key：priceMin, priceMax, category, categoryId, "

@@ -32,7 +32,7 @@ const selectedItems = computed(() =>
 const allSelected = computed(
   () => validItems.value.length > 0 && validItems.value.every((i) => selected.value.has(i.productId))
 )
-/** 已选商品件数（按数量累加，符合电商购物车习惯） */
+/** 已选商品件数（按数量累加，符合主流购物车习惯） */
 const selectedCount = computed(() =>
   selectedItems.value.reduce((sum, i) => sum + Number(i.quantity || 0), 0)
 )
@@ -66,7 +66,7 @@ async function loadCart() {
   try {
     const res = await cartApi.list(userStore.userId)
     items.value = Array.isArray(res.data) ? res.data : []
-    // 默认全部勾选有效商品（常见电商交互：进来就能直接结算）
+    // 默认全部勾选有效商品（常见交互：进来就能直接结算）
     selected.value = new Set(validItems.value.map((i) => i.productId))
   } catch (e) {
     errorMsg.value = e.message || '购物车加载失败，请稍后重试'

@@ -16,7 +16,7 @@
     <version>1.0.0</version>
     <packaging>pom</packaging>
     <name>fresh-ecommerce</name>
-    <description>「每日鲜」生鲜电商 - 微服务实战项目</description>
+    <description>巧见 · AI 个性化手作平台 - 微服务实战项目</description>
 
     <!-- 子模块列表 -->
     <modules>

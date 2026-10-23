@@ -1,6 +1,6 @@
-# 巧见 · 手作市集（Cloud Mall）
+# 巧见 · AI 个性化手作平台
 
-一个 **手作 / 生鲜电商全栈微服务实战项目**：Spring Boot 3 + Spring Cloud 后端、Vue 3 双前端（C 端商城 + B 端后台），外加一个 Python **AI 导购助手**（LangGraph Agent + RAG + 文生图）。
+一个 **AI 驱动的个性化手作平台全栈微服务实战项目**：Spring Boot 3 + Spring Cloud 后端、Vue 3 双前端（C 端商城 + B 端后台），并以 Python **AI 助手**（LangGraph Agent + RAG + 文生图）为核心能力，为用户提供个性化推荐与导购。
 
 > 面向微服务学习者：项目把「注册中心 → 网关 → 服务调用 → 熔断降级 → 担保交易 → 支付回调 → 实时 IM → LLM Agent」这条链路全部跑通，每个知识点都能在代码里找到落点。
 >
